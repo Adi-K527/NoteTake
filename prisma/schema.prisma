@@ -30,6 +30,7 @@ model User {
 model Note {
   id String @id @default(uuid()) 
   title String
+  caption String? @default("No caption has been provided for this note")
   body String
   comments Comment[] @relation("comments")
   courses Course[]
