@@ -9,3 +9,32 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Course {
+  id String @id @default(uuid())
+  name String 
+  description String? @default("No description has been provided for this course.")
+}
+
+model User {
+  id String @id @default(uuid())
+  firstName String
+  lastName String
+  userName String @unique
+
+}
+
+model Note {
+  id String @id @default(uuid()) 
+  title String
+  body String
+}
+
+
+model Comment {
+  id String @id @default(uuid())
+  text String 
+
+}
+
+
