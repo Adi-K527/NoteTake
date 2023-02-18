@@ -1,0 +1,122 @@
+import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLInt, GraphQLID, GraphQLNonNull, GraphQLScalarType } from "graphql"
+import {Note, User, Course, Comment} from "@prisma/client"
+import { PrismaClient } from ".prisma/client"
+
+const prisma = new PrismaClient()
+
+//types
+const NoteType: GraphQLObjectType = new GraphQLObjectType({
+    name: "Note",
+    description: "Represents a note",
+    fields: () => ({
+        id: {type: GraphQLNonNull(GraphQLID)},
+        title: {type: GraphQLNonNull(GraphQLString)},
+        caption: {type: GraphQLNonNull(GraphQLString)},
+        body: {type: GraphQLNonNull(GraphQLString)},
+        comments: {
+            type: GraphQLList(CommentType),
+            resolve: async (Note) => {
+                const note: Note | null = await prisma.note.findUnique({
+                    where: {id: Note.id},
+                    include: {comments: true}
+                })
+                return note?.comments
+            }
+        },
+        course: {
+            type: CourseType,
+            resolve: async (Note) => {
+                const note: Note | null = await prisma.note.findUnique({
+                    where: {id: Note.id},
+                })
+                return note?.course
+            }
+        },
+        createdBy: {
+            type: UserType,
+            resolve: async (Note) => {
+                const note: Note | null = await prisma.note.findUnique({
+                    where: {id: Note.id},
+                })
+                return note?.userid
+            }
+        }
+    })
+})
+
+const UserType: GraphQLObjectType = new GraphQLObjectType({
+    name: "User",
+    description: "Represents a user",
+    fields: () => ({
+        firstName: {type: GraphQLNonNull(GraphQLString)},
+        lastName: {type: GraphQLNonNull(GraphQLString)},
+        username: {type: GraphQLNonNull(GraphQLString)},
+        description: {type: GraphQLNonNull(GraphQLString)},
+        notes: {
+            type: GraphQLList(NoteType),
+            resolve: async (User) => {
+                const user: User | null = await prisma.user.findUnique({
+                    where: {id: User.id},
+                    include: {createdNotes: true}
+                })
+                return user?.createdNotes
+            }
+        },
+        courses: {
+            type: CourseType,
+            resolve: async (User) => {
+                const note: User | null = await prisma.user.findUnique({
+                    where: {id: User.id},
+                })
+                return note?.courses
+            }
+        },
+    })
+})
+
+const CourseType: GraphQLObjectType = new GraphQLObjectType({
+    name: "Course",
+    description: "Represents a course",
+    fields: () => ({
+        name: {type: GraphQLNonNull(GraphQLString)},
+        description: {type: GraphQLNonNull(GraphQLString)},
+        notes: {
+            type: GraphQLList(NoteType),
+            resolve: async (Course) => {
+                const course: Course | null = await prisma.course.findUnique({
+                    where: {id: Course.id},
+                    include: {notes: true}
+                })
+                return course?.notes
+            }
+        },
+        members: {
+            type: UserType,
+            resolve: async (Course) => {
+                const course: Course | null = await prisma.course.findUnique({
+                    where: {id: Course.id},
+                    include: {members: true}
+                })
+                return course?.members
+            }
+        },
+    })
+})
+
+
+const CommentType: GraphQLObjectType = new GraphQLObjectType({
+    name: "Comment",
+    description: "Represents a comment",
+    fields: () => ({
+        text: {type: GraphQLNonNull(GraphQLString)},
+        note: {
+            type: GraphQLList(NoteType),
+            resolve: async (comment) => {
+                return await prisma.note.findUnique({ where: {id: comment.noteid} })
+            }
+        },
+    })
+})
+
+
+export default {NoteType, CourseType, UserType, CommentType}

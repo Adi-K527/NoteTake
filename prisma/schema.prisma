@@ -14,7 +14,7 @@ model Course {
   id String @id @default(uuid())
   name String 
   description String? @default("No description has been provided for this course.")
-  notes Note[]
+  notes Note[] @relation("notes")
   members User[]
 }
 
@@ -33,7 +33,8 @@ model Note {
   caption String? @default("No caption has been provided for this note")
   body String
   comments Comment[] @relation("comments")
-  courses Course[]
+  courseid String
+  course Course @relation("notes", fields: [courseid], references: [id])
   userid String
   createdBy User @relation("userNotes", fields: [userid], references: [id])
 }
