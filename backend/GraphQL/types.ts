@@ -5,7 +5,7 @@ import { PrismaClient } from ".prisma/client"
 const prisma = new PrismaClient()
 
 //types
-const NoteType: GraphQLObjectType = new GraphQLObjectType({
+export const NoteType: GraphQLObjectType = new GraphQLObjectType({
     name: "Note",
     description: "Represents a note",
     fields: () => ({
@@ -44,7 +44,7 @@ const NoteType: GraphQLObjectType = new GraphQLObjectType({
     })
 })
 
-const UserType: GraphQLObjectType = new GraphQLObjectType({
+export const UserType: GraphQLObjectType = new GraphQLObjectType({
     name: "User",
     description: "Represents a user",
     fields: () => ({
@@ -74,7 +74,7 @@ const UserType: GraphQLObjectType = new GraphQLObjectType({
     })
 })
 
-const CourseType: GraphQLObjectType = new GraphQLObjectType({
+export const CourseType: GraphQLObjectType = new GraphQLObjectType({
     name: "Course",
     description: "Represents a course",
     fields: () => ({
@@ -104,7 +104,7 @@ const CourseType: GraphQLObjectType = new GraphQLObjectType({
 })
 
 
-const CommentType: GraphQLObjectType = new GraphQLObjectType({
+export const CommentType: GraphQLObjectType = new GraphQLObjectType({
     name: "Comment",
     description: "Represents a comment",
     fields: () => ({
@@ -118,5 +118,3 @@ const CommentType: GraphQLObjectType = new GraphQLObjectType({
     })
 })
 
-
-export default {NoteType, CourseType, UserType, CommentType}
