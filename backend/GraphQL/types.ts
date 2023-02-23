@@ -29,7 +29,7 @@ export const NoteType: GraphQLObjectType = new GraphQLObjectType({
                 const note: Note | null = await prisma.note.findUnique({
                     where: {id: Note.id},
                 })
-                return note?.course
+                return await prisma.course.findUnique({where: {id: note?.courseid}})
             }
         },
         createdBy: {
@@ -50,7 +50,7 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
     fields: () => ({
         firstName: {type: GraphQLNonNull(GraphQLString)},
         lastName: {type: GraphQLNonNull(GraphQLString)},
-        username: {type: GraphQLNonNull(GraphQLString)},
+        userName: {type: GraphQLNonNull(GraphQLString)},
         description: {type: GraphQLNonNull(GraphQLString)},
         notes: {
             type: GraphQLList(NoteType),
@@ -65,10 +65,10 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
         courses: {
             type: CourseType,
             resolve: async (User) => {
-                const note: User | null = await prisma.user.findUnique({
+                const user: User | null = await prisma.user.findUnique({
                     where: {id: User.id},
                 })
-                return note?.courses
+                return user?.joinedCourses
             }
         },
     })
