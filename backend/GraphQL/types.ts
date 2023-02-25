@@ -1,6 +1,7 @@
 import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLInt, GraphQLID, GraphQLNonNull, GraphQLScalarType } from "graphql"
 import {Note, User, Course, Comment} from "@prisma/client"
 import { PrismaClient } from ".prisma/client"
+import { userInfo } from "os"
 
 const prisma = new PrismaClient()
 
@@ -48,6 +49,7 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
     name: "User",
     description: "Represents a user",
     fields: () => ({
+        id: {type: GraphQLNonNull(GraphQLID)},
         firstName: {type: GraphQLNonNull(GraphQLString)},
         lastName: {type: GraphQLNonNull(GraphQLString)},
         userName: {type: GraphQLNonNull(GraphQLString)},
@@ -78,6 +80,7 @@ export const CourseType: GraphQLObjectType = new GraphQLObjectType({
     name: "Course",
     description: "Represents a course",
     fields: () => ({
+        id: {type: GraphQLNonNull(GraphQLID)},
         name: {type: GraphQLNonNull(GraphQLString)},
         description: {type: GraphQLNonNull(GraphQLString)},
         notes: {
@@ -91,12 +94,13 @@ export const CourseType: GraphQLObjectType = new GraphQLObjectType({
             }
         },
         members: {
-            type: UserType,
+            type: GraphQLList(UserType),
             resolve: async (Course) => {
                 const course: Course | null = await prisma.course.findUnique({
                     where: {id: Course.id},
                     include: {members: true}
                 })
+
                 return course?.members
             }
         },
@@ -108,6 +112,7 @@ export const CommentType: GraphQLObjectType = new GraphQLObjectType({
     name: "Comment",
     description: "Represents a comment",
     fields: () => ({
+        id: {type: GraphQLNonNull(GraphQLID)},
         text: {type: GraphQLNonNull(GraphQLString)},
         note: {
             type: GraphQLList(NoteType),

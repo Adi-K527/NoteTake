@@ -105,13 +105,21 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
             description: "Join a course",
             args: {course: {type: GraphQLID}, user: {type: GraphQLID}},
             resolve: async (parent, args) => {
-                const joinedCourse: Course | null = await prisma.course.findUnique({where: {id: args.course}})
+                var joinedCourse: Course | null = await prisma.course.findUnique({where: {id: args.course}})
                 const user: User | null = await prisma.user.findUnique({where: {id: args.user}})
                 if (user && joinedCourse) {   
-                    joinedCourse.members.push(user)
-                    return await prisma.course.update({where: {id: args.course}, data:{members: {set: {...joinedCourse.members}}}})
+                    console.log("hi")
+                    if (joinedCourse.members){
+                        joinedCourse.members.push(user)
+                        return await prisma.course.update({where: {id: args.course}, data:{members: {set: {...joinedCourse.members}}}})
+                    }
+                    else {
+                        let members: User[] = [user]
+                        return await prisma.course.update({where: {id: args.course}, data:{members: {set: {...members}}}})
+                    }
+
                 }
-                return null
+                return []
             }
         },
         leavecourse: {
