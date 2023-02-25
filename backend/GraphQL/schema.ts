@@ -82,7 +82,6 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
                         }
                     })
                 }
-
                 return []
             }
         },
