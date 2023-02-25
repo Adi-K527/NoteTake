@@ -19,6 +19,7 @@ GRAPHQL API SETUP
     - import all the different graphql types that there are
     - create the type defenitions, name, description, fields which is a function and inside it, u have all the properties stored in the prisma model, with the type of it like {type: GraphQLNonNull(GraphQLID)}. Fields must be same name as in model, then resolvers for the ones which arent implicitly defined, like relationships and arrays of objects
     - create query and mutation graphql object types, same method as above, resolvers needed
+    - use the connect method for arrays 
 
 Apollo GraphQL SETUP
     - make a standard query or mutation, but make it an export

@@ -39,7 +39,7 @@ export const NoteType: GraphQLObjectType = new GraphQLObjectType({
                 const note: Note | null = await prisma.note.findUnique({
                     where: {id: Note.id},
                 })
-                return note?.userid
+                return await prisma.user.findUnique({where: {id: note?.userid}})
             }
         }
     })
