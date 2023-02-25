@@ -117,7 +117,6 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
                         let members: User[] = [user]
                         return await prisma.course.update({where: {id: args.course}, data:{members: {set: {...members}}}})
                     }
-
                 }
                 return []
             }
