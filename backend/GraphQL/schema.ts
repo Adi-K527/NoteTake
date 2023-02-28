@@ -85,7 +85,7 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
                 return []
             }
         },
-        deletenote: {//         (note)
+        deletenote: {//       (note)
             type: NoteType,
             description: "Delete a note",
             args: {note: {type: GraphQLID}},
@@ -96,7 +96,8 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
                         await prisma.comment.deleteMany({where: {noteid: args.noteid}})
                         return await prisma.note.delete({where: {id: args.note}, include: {comments: true}})
                     })
-                } catch (error){
+                } 
+                catch (error){
                     console.error(error);
                     throw new Error('Failed to delete note and comments');
                 }
