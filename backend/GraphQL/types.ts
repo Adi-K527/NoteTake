@@ -65,10 +65,11 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
             }
         },
         courses: {
-            type: CourseType,
+            type: GraphQLList(CourseType),
             resolve: async (User) => {
                 const user: User | null = await prisma.user.findUnique({
                     where: {id: User.id},
+                    include: {joinedCourses: true}
                 })
                 return user?.joinedCourses
             }
@@ -114,12 +115,18 @@ export const CommentType: GraphQLObjectType = new GraphQLObjectType({
     fields: () => ({
         id: {type: GraphQLNonNull(GraphQLID)},
         text: {type: GraphQLNonNull(GraphQLString)},
-        note: {
-            type: GraphQLList(NoteType),
+        Note: {
+            type: NoteType,
             resolve: async (comment) => {
                 return await prisma.note.findUnique({ where: {id: comment.noteid} })
             }
         },
+        User: {
+            type: UserType,
+            resolve: async (comment) => {
+                return await prisma.user.findUnique({ where: {id: comment.userid} })
+            }
+        }
     })
 })
 

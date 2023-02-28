@@ -52,7 +52,7 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
     name: "Mutation",
     description: "Root Mutation",
     fields: () => ({
-        createuser: {
+        createuser: {//     (firstName, lastName, userName)
             type: UserType,
             description: "Create a user",
             args: {firstName: {type: GraphQLString}, lastName: {type: GraphQLString}, userName: {type: GraphQLString}},
@@ -60,7 +60,7 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
                 return await prisma.user.create({data: {firstName: args.firstName, lastName: args.lastName, userName: args.userName}})
             }
         },
-        createnote: {
+        createnote: {//     (title, body, course, user, caption)
             type: NoteType,
             description: "Create a note",
             args: {title: {type: GraphQLString}, body: {type: GraphQLString}, course: {type: GraphQLID}, user: {type: GraphQLID}, caption: {type: GraphQLString}},
@@ -68,7 +68,7 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
                 return await prisma.note.create({data: {title: args.title, body: args.body, caption: args.caption, createdBy: {connect: {id: args.user}}, course: {connect: {id: args.course}}}})
             }
         },
-        updatenote: {//
+        updatenote: {// 
             type: NoteType,
             description: "Edit a note",
             args: {newBody: {type: GraphQLString}, note: {type: GraphQLID}, user: {type: GraphQLID}},
@@ -85,23 +85,32 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
                 return []
             }
         },
-        deletenote: {//
+        deletenote: {//         (note)
             type: NoteType,
             description: "Delete a note",
-            args: {note: {type: GraphQLID}, user: {type: GraphQLID}},
+            args: {note: {type: GraphQLID}},
             resolve: async (parent, args) => {
-                return await prisma.note.delete({where: {id: args.note}})
+                try {
+                    await prisma.$transaction(async (prisma) => {
+                        const note: Note | null = await prisma.note.findUnique({where: {id: args.note}, include: {comments: true}})
+                        await prisma.comment.deleteMany({where: {noteid: args.noteid}})
+                        return await prisma.note.delete({where: {id: args.note}, include: {comments: true}})
+                    })
+                } catch (error){
+                    console.error(error);
+                    throw new Error('Failed to delete note and comments');
+                }
             }
         },
-        comment: {//
+        comment: {//        (text, Note, User)
             type: CommentType,
             description: "Create a note",
-            args: {text: {type: GraphQLString}, note: {type: GraphQLID}, user: {type: GraphQLID}},
+            args: {text: {type: GraphQLString}, Note: {type: GraphQLID}, User: {type: GraphQLID}},
             resolve: async (parent, args) => {
-                return await prisma.comment.create({data: {text: args.text, noteid: args.note}})
+                return await prisma.comment.create({data: {text: args.text, Note: {connect: {id: args.Note}}, User: {connect: {id: args.User}}}})
             }
         },
-        createcourse: {
+        createcourse: {//       (name, description)
             type: CourseType,
             description: "Create a course",
             args: {name: {type: GraphQLString}, description: {type: GraphQLString}},
@@ -109,20 +118,20 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
                 return await prisma.course.create({data: {name: args.name, description: args.description}}) 
             }
         },
-        joincourse: {
+        joincourse: {//         (course, user)
             type: CourseType,
             description: "Join a course",
             args: {course: {type: GraphQLID}, user: {type: GraphQLID}},
             resolve: async (parent, args) => {
-                var joinedCourse: Course | null = await prisma.course.findUnique({where: {id: args.course}})
+                const joinedCourse: Course | null = await prisma.course.findUnique({where: {id: args.course}})
                 const user: User | null = await prisma.user.findUnique({where: {id: args.user}})
                 if (user && joinedCourse) {   
                     return await prisma.course.update({where: {id: args.course}, data: {members: {connect: [{id: args.user}]}}})
                 }
-                return []
+                return null
             }
         },
-        leavecourse: {
+        leavecourse: {//        (course, user)
             type: CourseType,
             description: "Leave a course",
             args: {course: {type: GraphQLID}, user: {type: GraphQLID}},

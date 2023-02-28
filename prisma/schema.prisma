@@ -29,6 +29,8 @@ model User {
   createdNotes Note[] @relation("userNotes")
 
   joinedCourses Course[]
+
+  comments Comment[] @relation("userComments")
 }
 
 model Note {
@@ -53,6 +55,9 @@ model Comment {
 
   noteid String
   Note Note @relation("comments", fields: [noteid], references: [id])
+
+  userid String
+  User User @relation("userComments", fields: [userid], references: [id])
 }
 
 
