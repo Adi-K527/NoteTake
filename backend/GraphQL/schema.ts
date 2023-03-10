@@ -52,6 +52,7 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
     name: "Mutation",
     description: "Root Mutation",
     fields: () => ({
+        
         createuser: {//     (firstName, lastName, userName)
             type: UserType,
             description: "Create a user",
@@ -68,21 +69,12 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
                 return await prisma.note.create({data: {title: args.title, body: args.body, caption: args.caption, createdBy: {connect: {id: args.user}}, course: {connect: {id: args.course}}}})
             }
         },
-        updatenote: {// 
+        updatenote: {//       (newBody, note)
             type: NoteType,
             description: "Edit a note",
-            args: {newBody: {type: GraphQLString}, note: {type: GraphQLID}, user: {type: GraphQLID}},
-            resolve: async (parent, args) => {
-                const user: User | null = await prisma.user.findUnique({where: {id: args.user}})
-                const note: Note | null = await prisma.note.findUnique({where: {id: args.note}})
-                if (user){
-                    user.joinedCourses.forEach(async (course) => {
-                        if (course.id === note?.id){
-                            return await prisma.note.update({where: {id: args.note}, data:{body: args.newBody}})
-                        }
-                    })
-                }
-                return []
+            args: {newBody: {type: GraphQLString}, note: {type: GraphQLID}},
+            resolve: async (parent, args) => {                
+                return await prisma.note.update({where: {id: args.note}, data: {body: args.newBody}})
             }
         },
         deletenote: {//       (note)
