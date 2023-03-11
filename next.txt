@@ -1,0 +1,24 @@
+page name should be folder /About for example
+    - main page file shold be called page.tsx in the folder
+
+layout.tsx wraps every page with a common layout
+    - should add content in the body tag
+    - {children} is lik each individual page
+
+head.jsx can add headers to a page
+
+error.jsx will load if error
+
+loading.jsx
+
+go to tailwind docs to configure tailwind
+
+
+can only use useState, useEffect, onClick, stuff like that in client components, so have to make a seperated client component to handle that kind of stuff
+can create components inside the page folder itself and call it whatever
+
+next/Link
+
+dont think we need, but u need to do something in next-config if accessing api and outside database
+
+generate static params
