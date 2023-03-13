@@ -10,3 +10,5 @@ export const CREATE_COURSE = gql`
         }
     }
 `
+
+
