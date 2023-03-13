@@ -1,11 +1,10 @@
-Frontend:
-    - Courses, creating courses, joining courses, displaying courses
-    - Work on text editor, be able to modify text with styles and all
-    - be able to store those notes persitently, be able to download them as well, have them displayed 
-    - user auth and login, redis sessions: https://arctype.com/blog/node-session/
-    - use grammar checker api to check for grammar
-    - be able to send stuff in the courses and send notes as well
-    - be able to view the notes and comment on the notes
-    - edit and delete notes
-    - styling and tailwind components
-    - docker and host on aws
+- Courses, creating courses, displaying courses
+- Work on text editor, be able to modify text with styles and all
+- load notes and display them by title, be able to create new notes, be able to edit those notes, also delete those notes
+- user auth and login, redis sessions: https://arctype.com/blog/node-session/
+- work on courses, work on that entire interface, send notes, comment on notes, send messages
+- be able to view the notes and comment on the notes
+- fix database schema to be able to bring in APIs, possibly: (twilio, OpenAI)
+- fix serverside rendering, make everything configured with how the pages are rendered
+- styling and tailwind components
+- dockerize and host on aws

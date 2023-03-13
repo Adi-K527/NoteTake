@@ -13,7 +13,7 @@ export const GET_COURSES = gql`
 
 export const GET_COURSE = gql`
     query course($id: ID!) {
-        courses(id: $id) { 
+        course(id: $id) { 
             id
             name
             description
