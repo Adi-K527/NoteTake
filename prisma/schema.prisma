@@ -25,6 +25,7 @@ model User {
   firstName String
   lastName String
   userName String @unique
+  password String
 
   createdNotes Note[] @relation("userNotes")
 

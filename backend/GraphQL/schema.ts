@@ -1,12 +1,16 @@
-import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLInt, GraphQLID, GraphQLNonNull, GraphQLScalarType, graphql } from "graphql"
+import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLInt, GraphQLID, GraphQLNonNull, GraphQLScalarType, graphql, GraphQLBoolean } from "graphql"
 import {Note, User, Course, Comment} from "@prisma/client"
 import { PrismaClient } from ".prisma/client"
 import {NoteType} from "./types"
 import {CourseType} from "./types"
 import {UserType} from "./types"
 import {CommentType} from "./types"
+import bcrypt from "bcryptjs" 
+
+
 
 const prisma = new PrismaClient()
+
 
 const RootQueryType: GraphQLObjectType = new GraphQLObjectType({
     name: "Query",
@@ -52,13 +56,45 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
     name: "Mutation",
     description: "Root Mutation",
     fields: () => ({
-        
-        createuser: {//     (firstName, lastName, userName)
+        register: {//     (firstName, lastName, userName)
             type: UserType,
-            description: "Create a user",
-            args: {firstName: {type: GraphQLString}, lastName: {type: GraphQLString}, userName: {type: GraphQLString}},
-            resolve: async (parent, args) => {
-                return await prisma.user.create({data: {firstName: args.firstName, lastName: args.lastName, userName: args.userName}})
+            description: "Register a user",
+            args: {firstName: {type: GraphQLString}, lastName: {type: GraphQLString}, userName: {type: GraphQLString}, password: {type: GraphQLString}},
+            resolve: async (parent, args, context) => {
+                const salt = await bcrypt.genSalt(12)
+                const hashed_password = await bcrypt.hash(args.password, salt);
+                const user: User = await prisma.user.create({data: {firstName: args.firstName, lastName: args.lastName, userName: args.userName, password: hashed_password}})
+
+                context.req.session.userid = user.id
+                return user
+            }
+        },
+        login: {//     (firstName, lastName, userName)
+            type: UserType,
+            description: "Register a user",
+            args: {userName: {type: GraphQLString}, password: {type: GraphQLString}},
+            resolve: async (parent, args, context) => {
+                const user = await prisma.user.findUnique({where: {userName: args.userName}})
+                if (user) {
+                    const passwordMatch = await bcrypt.compare(args.password, user.password);
+                    if (passwordMatch){
+                        context.req.session.userid = user.id
+                        return user
+                    }
+                }
+                throw new Error("Invalid Credentials")
+            }
+        },
+        logout: {//     ()
+            type: GraphQLBoolean,
+            description: "Register a user",
+            resolve: async (parent, args, context) => {
+                context.req.session.destroy((err: Error) => {
+                    if (err) {
+                      throw new Error('Could not logout');
+                    }
+                  });
+                  return true;
             }
         },
         createnote: {//     (title, body, course, user, caption)

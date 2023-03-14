@@ -37,7 +37,6 @@ export default function page() {
                 const data = editor.getData() 
                 setText(data)
             }}>
-
             </CKEditor>
         </div>
         <div>

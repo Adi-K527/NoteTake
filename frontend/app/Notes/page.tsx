@@ -1,5 +1,5 @@
 "use client"
-import { useQuery } from "@apollo/client"
+import { useMutation, useQuery } from "@apollo/client"
 import { Note } from "@prisma/client"
 import { redirect } from "next/dist/server/api-utils"
 import Link from "next/link"
@@ -12,8 +12,6 @@ export default function page() {
 
   const {data} = useQuery(GET_NOTES)
   const router = useRouter()
-
-
 
   return (
     <div>

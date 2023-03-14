@@ -5,6 +5,9 @@ import { userInfo } from "os"
 
 const prisma = new PrismaClient()
 
+
+//have to redo types in typescript file when rerunning prisma migrate
+
 //types
 export const NoteType: GraphQLObjectType = new GraphQLObjectType({
     name: "Note",
@@ -53,6 +56,7 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
         firstName: {type: GraphQLNonNull(GraphQLString)},
         lastName: {type: GraphQLNonNull(GraphQLString)},
         userName: {type: GraphQLNonNull(GraphQLString)},
+        password: {type: GraphQLNonNull(GraphQLString)},
         description: {type: GraphQLNonNull(GraphQLString)},
         notes: {
             type: GraphQLList(NoteType),
